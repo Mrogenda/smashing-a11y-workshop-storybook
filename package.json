@@ -1,0 +1,45 @@
+{
+  "name": "smashing-design-system",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "A small design system: themed atoms and a composed search module, documented in Storybook.",
+  "scripts": {
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:storybook": "vitest run --project=storybook",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "styled-components": "6.5.3"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@storybook/addon-docs": "10.5.10",
+    "@storybook/addon-themes": "10.5.10",
+    "@storybook/addon-vitest": "10.5.10",
+    "@storybook/react-vite": "10.5.10",
+    "@types/node": "26.4.0",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.5",
+    "@vitejs/plugin-react": "6.1.1",
+    "@vitest/browser-playwright": "4.1.11",
+    "eslint": "10.9.1",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "eslint-plugin-storybook": "10.5.10",
+    "playwright": "1.62.1",
+    "prettier": "3.9.6",
+    "storybook": "10.5.10",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.68.0",
+    "vite": "8.2.2",
+    "vitest": "4.1.11"
+  }
+}

@@ -1,0 +1,35 @@
+import { Canvas, Meta } from '@storybook/addon-docs/blocks';
+
+import * as TokensStories from './Tokens.stories';
+
+<Meta of={TokensStories} />
+
+# Tokens
+
+Everything below reads from the **active theme**. Switch the toolbar between light and
+dark to see which values are shared and which invert.
+
+Raw primitives live in `src/tokens/tokens.ts`; `src/tokens/themes.ts` maps them onto the
+semantic keys shown here. Components only ever consume the semantic layer.
+
+## Colour
+
+`primary` is the dark green brand. It is the one group that genuinely changes between
+themes — light uses `brand.600` on white, dark uses the far lighter `brand.400` so the
+button stays visible on a dark surface.
+
+<Canvas of={TokensStories.Colors} />
+
+## Spacing
+
+A single scale, shared by both themes. Bars are drawn at their literal width.
+
+<Canvas of={TokensStories.Spacing} />
+
+## Typography
+
+<Canvas of={TokensStories.Typography} />
+
+## Radii
+
+<Canvas of={TokensStories.Radii} />

@@ -1,0 +1,35 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Introduction" />
+
+# Smashing Design System
+
+A deliberately small design system, built to show the layering rather than the surface
+area. Three levels, each one only allowed to reach down:
+
+**Tokens** — `src/tokens`. Raw primitives (a dark-green brand ramp, a neutral ramp, a
+spacing and type scale) mapped onto _semantic_ keys by two themes. Components read
+`theme.colors.primary`, never a hex.
+
+**Atoms** — `src/atoms`. The indivisible pieces. `Button` (primary / secondary) and
+`Input`. They know about the theme and nothing else.
+
+**Modules** — `src/modules`. Compositions of atoms that carry behaviour. `SearchForm`
+owns controlled/uncontrolled state, trimming, and submission — the atoms below it stay
+presentational.
+
+## Light and dark
+
+Use the **Theme** control in the toolbar above to flip every story. The two themes share
+one `Theme` type, so a key added to light must exist in dark.
+
+The brand ramp inverts across the two. In light, `primary` is a deep forest green
+(`#1f5c36`) with white text. In dark, that same green would sink into the background, so
+`primary` becomes the lighter `#479a63` with near-black green text. Same semantic slot,
+opposite end of the ramp — that inversion is the whole reason the semantic layer exists.
+
+## Interaction tests
+
+`SearchForm` stories carry `play` functions that drive the real DOM: typing, submitting,
+clearing, and refusing to search on whitespace. They run in the Interactions panel and
+headlessly via `npm run test:storybook`.
