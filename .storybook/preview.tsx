@@ -21,6 +21,8 @@ const preview: Preview = {
   parameters: {
     // The theme toolbar owns the canvas background.
     backgrounds: { disable: true },
+    // Fails run on any axe violation, not just an a11y panel
+    a11y: { test: 'error' },
     controls: {
       matchers: {
         color: /(background|color)$/i,
