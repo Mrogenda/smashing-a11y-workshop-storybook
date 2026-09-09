@@ -3,8 +3,9 @@ import { readFileSync, existsSync, createReadStream } from 'node:fs';
 import { extname, join } from 'node:path';
 import { chromium } from 'playwright';
 
-const ROOT = 'storybook-static';
 const BUDGET = Number(process.env.A11Y_BUDGET ?? 1);
+
+const ROOT = 'storybook-static';
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.json': 'application/json',
   '.css': 'text/css', '.svg': 'image/svg+xml', '.png': 'image/png', '.woff2': 'font/woff2',
   '.ico': 'image/x-icon', '.map': 'application/json' };
@@ -24,16 +25,31 @@ const server = createServer((req, res) => {
 await new Promise((r) => server.listen(0, r));
 const base = `http://localhost:${server.address().port}`;
 
-const stories = Object.values(JSON.parse(readFileSync(join(ROOT, 'index.json'), 'utf8')).entries)
-  .filter((e) => e.type === 'story');
-const axeSource = readFileSync('node_modules/axe-core/axe.min.js', 'utf8');
+const ids = Object.values(JSON.parse(readFileSync(join(ROOT, 'index.json'), 'utf8')).entries)
+  .filter((e) => e.type === 'story')
+  .map((e) => e.id);
 
 const browser = await chromium.launch();
 const page = await browser.newPage();
-const found = [];
 
-for (const story of stories) {
-  await page.goto(`${base}/iframe.html?id=${story.id}&viewMode=story`, { waitUntil: 'networkidle' });
+// One page load is enough: the story store resolves parameters for any story id.
+await page.goto(`${base}/iframe.html?id=${ids[0]}&viewMode=story`, { waitUntil: 'networkidle' });
+const todos = await page.evaluate(async (storyIds) => {
+  const preview = window.__STORYBOOK_PREVIEW__;
+  await preview.storeInitializationPromise;
+  const out = [];
+  for (const id of storyIds) {
+    const story = await preview.storyStore.loadStory({ storyId: id });
+    if (story?.parameters?.a11y?.test === 'todo') out.push(id);
+  }
+  return out;
+}, ids);
+
+// Check whether each todo is still suppressing something, or is now stale.
+const axeSource = readFileSync('node_modules/axe-core/axe.min.js', 'utf8');
+const status = [];
+for (const id of todos) {
+  await page.goto(`${base}/iframe.html?id=${id}&viewMode=story`, { waitUntil: 'networkidle' });
   await page.waitForSelector('#storybook-root > *').catch(() => {});
   await page.evaluate(axeSource);
   const { violations } = await page.evaluate(() =>
@@ -41,17 +57,19 @@ for (const story of stories) {
       runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'] },
     }),
   );
-  for (const v of violations) found.push({ story: story.id, rule: v.id, impact: v.impact });
+  status.push({ id, rules: violations.map((v) => v.id) });
 }
 
 await browser.close();
 server.close();
 
-for (const f of found) console.log(`  ${f.impact.padEnd(8)} ${f.rule.padEnd(18)} ${f.story}`);
-console.log(`\n${found.length} violation(s) across ${stories.length} stories — budget ${BUDGET}`);
+for (const { id, rules } of status) {
+  console.log(rules.length ? `  todo  ${id}  (${rules.join(', ')})` : `  STALE ${id}  (no violations — remove the todo)`);
+}
+console.log(`\n${todos.length} a11y todo(s) across ${ids.length} stories — budget ${BUDGET}`);
 
-if (found.length > BUDGET) {
-  console.error(`\nOver budget by ${found.length - BUDGET}.`);
+if (todos.length > BUDGET) {
+  console.error(`\nOver budget by ${todos.length - BUDGET}. Fix a violation or raise A11Y_BUDGET deliberately.`);
   process.exit(1);
 }
 console.log('Within budget.');
