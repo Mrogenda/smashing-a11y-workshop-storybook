@@ -3,6 +3,7 @@ import type { Preview, ReactRenderer } from '@storybook/react-vite';
 import styled, { ThemeProvider } from 'styled-components';
 
 import { GlobalStyle, darkTheme, lightTheme } from '../src/tokens';
+import test from 'node:test';
 
 /**
  * Docs pages paint their own always-light container, so stories need to carry
@@ -18,7 +19,11 @@ const Surface = styled.div`
 
 const preview: Preview = {
   tags: ['autodocs'],
+
   parameters: {
+    a11y: {
+      test: 'error'
+    },
     // The theme toolbar owns the canvas background.
     backgrounds: { disable: true },
     controls: {
