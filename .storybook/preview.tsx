@@ -3,7 +3,6 @@ import type { Preview, ReactRenderer } from '@storybook/react-vite';
 import styled, { ThemeProvider } from 'styled-components';
 
 import { GlobalStyle, darkTheme, lightTheme } from '../src/tokens';
-import test from 'node:test';
 
 /**
  * Docs pages paint their own always-light container, so stories need to carry
