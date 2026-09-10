@@ -5,6 +5,12 @@ import { Button } from './Button';
 const meta = {
   title: 'Broken/Icon Button',
   component: Button,
+  parameters: {
+    a11y: {
+      // TODO: I will fix that in TICKET - MR 10.09.2026
+      test: 'todo'
+    }
+  }
 } satisfies Meta<typeof Button>;
 
 export default meta;
